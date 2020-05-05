@@ -1,0 +1,46 @@
+clc;
+clear;
+%Albert Tan 2020.3.19
+%假设学生的能力值用一个60-100之间的整数表示，分数越高则能力越强
+n = 100;                        %学生总数
+a = zeros( 1, n );              %能力值数组
+sim_times = 100000;                %模拟次数
+
+
+%模拟选择
+sample_len = 1;                 %sample大小的初始值
+best = zeros(1,n);              %按照策略在s值取到最优学生的次数
+
+for i = 1:sim_times
+    %每次模拟前重新初始化a数组
+    for j = 1:n
+        a(j) = unifrnd(60,100);      %随机初始化能力值
+        %a(j) = randi([60,100]);
+    end
+    [max_a,max_a_index] = max(a);    %ability最大值与其下标
+    
+    %每一次模拟对应s取一至一百，得到对应样本最大值
+    for sample_len = 1:100                %分别取s为1到一百
+        sample_list = a(1:sample_len);    %样本列表
+        [max_s,max_s_index] = max(sample_list);    %sample最大值与其下标
+       
+        %对于sample后面的所有成员择优选择
+        for k = sample_len+1:100
+            %一旦有由于sample最大值的成员
+            if a(k)>max_s
+                %若此成员就是最优秀成员
+                if k == max_a_index
+                    %在best数组对应s值下记录该次成功
+                    best(sample_len) = best(sample_len) + 1;
+                end
+                break;
+            end    %if a(k)>max_s
+        end     %remain
+    end    %s_len
+end    %sim_times
+
+x = 1:100;
+plot(x,best);
+xlabel('sample大小');
+ylabel('取得最大值的次数');
+[E,best_sample_len] = max(best);
